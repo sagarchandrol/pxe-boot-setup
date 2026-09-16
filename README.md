@@ -1,24 +1,26 @@
 ## Roadmap & Features
-[x] - Legacy BIOS network boot (pxelinux)
-[] - Automated RHEL installation via kickstart (ks.cfg)
-[] - DHCP option 93/60 autodetection (legacy BIOS vs UEFI)
-[] - UEFI boot over network (bootx64.efi / GRUB2)
-[] - Samba integration for windows automated installation
+- [x] Legacy BIOS network boot (pxelinux)
+- [] Automated RHEL installation via kickstart (ks.cfg)
+- [] DHCP option 93/60 autodetection (legacy BIOS vs UEFI)
+- [] UEFI boot over network (bootx64.efi / GRUB2)
+- [] Samba integration for windows automated installation
 
 setting/creating a virtual bridge(switch) in QEMU using virsh
-# create a custom file pxe-net.xml with minimal settings
+**create a custom file pxe-net.xml with minimal settings**
 add lines
+'''xml
 <network>
   <name>PXE-net</name>
   <bridge name='PXEbr0' stp='on' delay='0'/>
 </network>
-# go to virsh interactive mode or enter lines with virsh in terminal
+'''
+**go to virsh interactive mode or enter lines with virsh in terminal**
 virsh -c qemu:///system net-list --all
 virsh
 net-define /path/to/pxe-net.xml
 net-start PXE-net
 net-autostart PXE-net
-# check whether the network has been added or not
+**check whether the network has been added or not**
 ip link show pxebr0
 # add the bridge to the domains or vm
 virsh edit <domain name>
