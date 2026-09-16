@@ -1,3 +1,10 @@
+## Roadmap & Features
+[x] - Legacy BIOS network boot (pxelinux)
+[] - Automated RHEL installation via kickstart (ks.cfg)
+[] - DHCP option 93/60 autodetection (legacy BIOS vs UEFI)
+[] - UEFI boot over network (bootx64.efi / GRUB2)
+[] - Samba integration for windows automated installation
+
 setting/creating a virtual bridge(switch) in QEMU using virsh
 # create a custom file pxe-net.xml with minimal settings
 add lines
