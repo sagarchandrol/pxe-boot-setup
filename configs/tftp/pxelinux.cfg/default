@@ -1,12 +1,16 @@
 DEFAULT menu.c32
 PROMPT 0
-TIMEOUT 10
+TIMEOUT 60
 ONTIMEOUT rhel8-auto
 
 MENU TITLE RHEL Network Installation
 
 LABEL rhel8-auto
-      MENU LABEL Install RHEL 9 (Automated Kickstart)
+      MENU LABEL Install RHEL 8 (Automated Kickstart)
       KERNEL rhel8/vmlinuz
       INITRD rhel8/initrd.img
-      APPEND inst.ks=http://192.168.10.1/ks.cfg inst.repo=http://192.168.10.1/rhel8/BaseOS ip=dhcp
+      APPEND inst.ks=http://192.168.10.1/ks.cfg inst.repo=http://192.168.10.1/rhel8/ ip=dhcp
+
+LABEL local
+      MENU LABEL Boot from Local-Drive
+      LOCALBOOT 0
