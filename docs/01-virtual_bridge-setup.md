@@ -1,3 +1,4 @@
+
 # Network Topology: Virtual Bridge Setup
 To allow broadcast-based DHCP and TFTP communication, a level-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain
 
@@ -26,7 +27,7 @@ This setup uses **libvert** to manage linux bridge and virtual machine networkin
 
 
 
-### Create a custom file pxe-net.xml with minimal settings
+### Step 1: Create a custom file pxe-net.xml with minimal settings
 Start with a `<network>` element with the name of the network device  
 Create a `<bridge>` element with the name of the bridge, set STP as enabled and delay to zero
 ```
@@ -37,7 +38,7 @@ Create a `<bridge>` element with the name of the bridge, set STP as enabled and 
 ```
 
 
-### Define and Start the network device in `virsh` CLI interactive mode
+### Step 2: Define and Start the network device in `virsh` CLI interactive mode
 To run virsh in `qemu:///system` mode, user must either be a member of `wheel` group and/or `libvirt` group
 ``` bash
 sudo virsh -c qemu:///system
@@ -51,10 +52,10 @@ ip link show PXEbr0
 ```
 
 
-### Connect the network interface to the server virtual machine and client virtual machine
+### Step 3: Connect the network interface to the server virtual machine and client virtual machine
 check whethter the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
 `sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///sesssion list --all`  
-virtual machines in my case runs in `qemu:///session mode`
+virtual machines in my case runs in `qemu:///session` mode
 ``` bash
 virsh -c qemu:///session edit <server vm name>
 ```
@@ -70,7 +71,7 @@ Virtual machines run under normal user or (libvert-qemu) user, but creating a ne
 sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
 ```
 
-**whitelist the virtual bridge**
+**Whitelist the virtual bridge**
 ```
 echo "allow PXEbr0" | sudo tee /etc/qemu/bridge.conf
 ```
