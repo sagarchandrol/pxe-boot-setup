@@ -1,4 +1,3 @@
-
 # Network Topology: Virtual Bridge Setup
 To allow broadcast-based DHCP and TFTP communication, a level-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain
 
@@ -20,14 +19,14 @@ _________________________________________________________________
 
 
 ## Prerequisites and Environment
-This setup uses **libvert** to manage linux bridge and virtual machine networking. Ensure the following are available:
-- **Hyprevisor**: QEMU/KVM
-- **Management Tools**: `libvirt` daemon (libvertd) running with `virsh` CLI
-- **Privelges**: `sudo`/ROOT privelges for (qemu:///system) system networks
+This setup uses **libvirt** to manage linux bridge and virtual machine networking. Ensure the following are available:
+- **Hypervisor**: QEMU/KVM
+- **Management Tools**: `libvirt` daemon (libvirtd) running with `virsh` CLI
+- **Privileges**: `sudo`/ROOT privilege for (qemu:///system) system networks
 
 
 
-### Step 1: Create a custom file pxe-net.xml with minimal settings
+### Step 1: Create a custom file `pxe-net.xml` with minimal settings
 Start with a `<network>` element with the name of the network device  
 Create a `<bridge>` element with the name of the bridge, set STP as enabled and delay to zero
 ```
@@ -43,8 +42,8 @@ To run virsh in `qemu:///system` mode, user must either be a member of `wheel` g
 ``` bash
 sudo virsh -c qemu:///system
 net-define /path/to/pxe-net.xml
-net-start PXEbr0
-net-autostart PXEbr0
+net-start PXE-Net
+net-autostart PXE-Net
 ```
 **Check the network**
 ```
@@ -53,20 +52,20 @@ ip link show PXEbr0
 
 
 ### Step 3: Connect the network interface to the server virtual machine and client virtual machine
-check whethter the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
-`sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///sesssion list --all`  
+check whether the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
+`sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///session list --all`  
 virtual machines in my case runs in `qemu:///session` mode
 ``` bash
 virsh -c qemu:///session edit <server vm name>
 ```
 In the editor, either replace the existing `<interface>` element or create a new `<interface>` element
 ```
-<interface type='bridge>
+<interface type='bridge'>
   <source bridge='PXEbr0'/>
   <model type='virtio'/>
 </interface>
 ```
-Virtual machines run under normal user or (libvert-qemu) user, but creating a network TAP requires root privelge. So we use a binary called `qemu-bridge-helper` to temperorily run as privelged user for the duration of the network operations
+Virtual machines run under normal user or (libvirt-qemu) user, but creating a network TAP requires root privilege. So we use a binary called `qemu-bridge-helper` to temporarily run as privileged user for the duration of the network operations
 ```
 sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
 ```
