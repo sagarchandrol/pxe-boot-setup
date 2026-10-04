@@ -147,7 +147,7 @@ poweroff
 
 
 ### Test the PXE boot
-**Start and enable DHCP,TFTP and HTTP services**  
+**Start and enable DHCP, TFTP and HTTP services**  
 ```
 sudo systemctl enable --now httpd tftp dhcpd
 systemctl status httpd tftp dhcpd
