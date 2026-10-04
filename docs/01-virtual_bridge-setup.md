@@ -45,8 +45,10 @@ net-define /path/to/pxe-net.xml
 net-start PXEbr0
 net-autostart PXEbr0
 ```
-**Check the network**  
-```ip link show PXEbr0```
+**Check the network**
+```
+ip link show PXEbr0
+```
 
 
 ### Connect the network interface to the server virtual machine and client virtual machine
