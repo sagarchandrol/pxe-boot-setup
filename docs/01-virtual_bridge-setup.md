@@ -54,7 +54,7 @@ ip link show PXEbr0
 ### Step 3: Connect the network interface to the server virtual machine and client virtual machine
 check whether the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
 `sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///session list --all` to list virtual machines  
-virtual machines in my case runs in `qemu:///session` mode
+virtual machines in my case run in `qemu:///session` mode
 ``` bash
 virsh -c qemu:///session edit <server vm name>
 ```
