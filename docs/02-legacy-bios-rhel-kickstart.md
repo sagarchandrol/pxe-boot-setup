@@ -4,7 +4,7 @@ It obtains IP address and instructions to pull the core bootloader `pxelinux.0` 
 After loading the core bootloader and menu config, it queries for **kernel** `vmlinuz` and **initial RAM Disk** `initrd.img` over TFTP.  
 The hardware switches from NIC ROM to linux kernel and the kernel mounts `initrd.img` as a temporary in-memory file system.  
 The system downloads  SquashFS runtime `install.img` over HTTP and mounts it as temporary root filesystem (/)  
-The installer runtime contains **Anaconda** which parses the kickstarter file `ks.cfg` and installs OS packages onto the targetted disk.
+The installer runtime contains **Anaconda** which parses the kickstarter file `ks.cfg` and installs OS packages onto the targeted disk.
 
 
 
@@ -13,49 +13,50 @@ Before configuring the services, please ensure the following packages and resour
 - **Network & Installation Services**
   - `dhcp server` (`dhcpd`): To lease IP address and deliver PXE boot options (Next Server & Filename)
   - `tftp-server`: To host initial bootloader, modules and kernel binaries
-  - `httpd` (Apache): To server the kickstart configration and OS repositories  
-Install them using
+  - `httpd` (Apache): To server the kickstart configuration and OS repositories  
 ```
+# Install them using
 sudo dnf install httpd tftp dhcp-server
 ```
 
 - **Bootloader Files (syslinx packages)**
   - Core Bootloader: `pxelinux.0`
   - syslinux modules: `menu.c32`, `ldlinux.c32`, `libcom32.c32`, `libutil.c32`  
-Install `syslinux` package to get bootloader and modules
+
 ```
+# Install `syslinux` package to get bootloader and modules
 sudo dnf install syslinux syslinux-tftpboot
 ```
 
 - **Operating System Media**
-  - REHL 8 DVD ISO mounted to provide (`vmliuz`, `initrd.img` and package repositories)
+  - RHEL 8 DVD ISO mounted to provide (`vmlinuz`, `initrd.img` and package repositories)
 
 
 
-### Step 1: Server base configration (IP & Firewall)
+### Step 1: Server base configuration (IP & Firewall)
 
 
 NOTE: The network device name for the server is `enp1s0`  
 Provide static IP to the server
 ```
-sudo nmcli connection modify enp1s0 ip.method manual ip.address 192.168.10.1/24
+sudo nmcli connection modify enp1s0 ipv4.method manual ipv4.address 192.168.10.1/24
 ```
 
 
 Open firewall ports for DHCP service, TFTP service and HTTP service
 ```
-sudo firwall-cmd --add-service=http --add-service=tftp --add-service=dhcp --permanent
+sudo firewall-cmd --add-service=http --add-service=tftp --add-service=dhcp --permanent
 sudo firewall-cmd --reload
 ```
 
 
-### Step 2: DHCP service configration  
+### Step 2: DHCP service configuration  
 copy or move `menu.c32`, `ldlinux.c32`, `libcom32.c32`, `libutil.c32`, `pxelinux.0` from `/tftpboot/` to the tftp server's root directory `/var/lib/tftpboot/`   
 ```
-sudo cp /tftp/{menu.c32,ldlinux.c32,libcom32.c32,libutil.c32,pxelinux.0} /var/lib/tftpboot/
+sudo cp /tftpboot/{menu.c32,ldlinux.c32,libcom32.c32,libutil.c32,pxelinux.0} /var/lib/tftpboot/
 ```
 
-Edit the dhcp configration file at `/etc/dhcp/dhcpd.cong`
+Edit the dhcp configuration file at `/etc/dhcp/dhcpd.conf`
 ```
 sudo $EDITOR /etc/dhcp/dhcpd.conf
 ```
@@ -64,7 +65,7 @@ Add the following lines for a minimal PXE boot setup
 subnet 192.168.10.0 netmask 255.255.255.0 {
        range 192.168.10.2 192.168.10.10;
        option routers 192.168.10.1;
-       options domain-name-servers 192.168.10.1;
+       option domain-name-servers 192.168.10.1;
 
 # address of the tftp server
        next-server 192.168.10.1;
@@ -79,7 +80,7 @@ Mount the RHEL 8 DVD ISO to any path and copy `vmlinuz` & `initrd.img`
 Note: The mount point for RHEL 8 DVD ISO on my system is `/mnt/iso/`
 ```
 sudo mkdir /var/lib/tftpboot/rhel8
-sudo cp /mnt/iso/images/pxeboot/{vmliuz,initrd.img} /var/lib/tftpboot/rhel8
+sudo cp /mnt/iso/images/pxeboot/{vmlinuz,initrd.img} /var/lib/tftpboot/rhel8
 ```
 Create and edit the pxelinux config file named `default` inside the `pxelinux.cfg` directory
 Make sure the `pxelinux.cfg` directory is in the same path as the pxelinux.0 and modules
@@ -99,7 +100,7 @@ LABEL rhel8-auto
       MENU LABEL Install RHEL8 (kickstart)
       KERNEL rhel8/vmlinuz
       INITRD rhel8/initrd.img
-      APPEND inst.ks=192.168.10.1/ks.cfg inst.repo=192.168.10.1/rhel8/
+      APPEND inst.ks=http://192.168.10.1/ks.cfg inst.repo=http://192.168.10.1/rhel8/
 LABEL local
       MENU LABEL Boot from Local Disk
       MENU DEFAULT
@@ -111,7 +112,7 @@ LABEL local
 Copy the `AppStream`, `BaseOS`, `images`, `.discinfo`, `RPM-GPG-KEY-redhat-beta`, `RPM-GPG-KEY-redhat-release`, `.treeinfo` from the mount point to the http root directory
 ```
 sudo mkdir /var/www/html/rhel8/
-sudo cp -r /mnt/iso/{AppStream,BaseOS,images,\.discinfo,RPM-GPG-KEY-redhat-beta,RPM-GPG-KEY-redhat-release,\.treeinfo} /var/www//html/rhel8/
+sudo cp -r /mnt/iso/{AppStream,BaseOS,images,\.discinfo,RPM-GPG-KEY-redhat-beta,RPM-GPG-KEY-redhat-release,\.treeinfo} /var/www/html/rhel8/
 ```
 Now the Repositories are in place, generate encrypted password for root user and normal users  
 Else use --plaintext in kickstart file
@@ -124,10 +125,10 @@ sudo $EDITOR /var/www/html/ks.cfg
 Add **keyboard layout**, **Timezone**,**system language**, **packages**, **username** & **password** to suit your environment. The values provided here are for reference and can be customized as needed  
 ```
 text
-keyboard -xlayouts='us'
+keyboard --xlayouts='us'
 lang en_US.UTF-8
 timezone Asia/Kolkata --utc
-network --bootproto=DHCP --device=link activate
+network --bootproto=DHCP --device=link --activate
 zerombr
 clearpart --initlabel --all
 autopart
@@ -136,8 +137,8 @@ autopart
 @core
 @standard
 %end
-rootpw --iscripted $6$P2drDZlO4slqBm3g$HlLll23iMK4dawwQPPqbXzA/mo4fuyFtlcqc0IFbmfQFPfER07tKQyg2bIuJM.KuvWIU.Kk3/wrepl1VCJTy6.
-user --name='username' --group='wheel' --iscripted --password=$6$6zTXC2TxLaUwGshK$T2OJZYLJ3kFjYx2Hscc5I7/bSJIRfYFg0SaHv2f.6h7Z40/D5XonCm57sOdvPjbqbNogHq8nunsdh3wJ/O95o0
+rootpw --iscrypted $6$P2drDZlO4slqBm3g$HlLll23iMK4dawwQPPqbXzA/mo4fuyFtlcqc0IFbmfQFPfER07tKQyg2bIuJM.KuvWIU.Kk3/wrepl1VCJTy6.
+user --name='username' --group='wheel' --iscrypted --password=$6$6zTXC2TxLaUwGshK$T2OJZYLJ3kFjYx2Hscc5I7/bSJIRfYFg0SaHv2f.6h7Z40/D5XonCm57sOdvPjbqbNogHq8nunsdh3wJ/O95o0
 %post
 systemctl set-default graphical.target
 %end
@@ -146,4 +147,9 @@ poweroff
 
 
 ### Test the PXE boot
-With DHCP, TFTP and HTTP services configured and running, start the client virtual machine. Ensure its boot order is set to network boot (PXE) and it will automatically aquire IP address, load boot menu and begin unattended installation
+**Start and enable DHCP,TFTP and HTTP services**  
+```
+sudo systemctl enable --now httpd tftp dhcpd
+systemctl status httpd tftp dhcpd
+```  
+With DHCP, TFTP and HTTP services configured and running, start the client virtual machine. Ensure its boot order is set to network boot (PXE) and it will automatically acquire IP address, load boot menu and begin unattended installation
