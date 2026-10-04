@@ -19,7 +19,7 @@ Before configuring the services, please ensure the following packages and resour
 sudo dnf install httpd tftp dhcp-server
 ```
 
-- **Bootloader Files (syslinx packages)**
+- **Bootloader Files (syslinux packages)**
   - Core Bootloader: `pxelinux.0`
   - syslinux modules: `menu.c32`, `ldlinux.c32`, `libcom32.c32`, `libutil.c32`  
 
@@ -39,7 +39,7 @@ sudo dnf install syslinux syslinux-tftpboot
 NOTE: The network device name for the server is `enp1s0`  
 Provide static IP to the server
 ```
-sudo nmcli connection modify enp1s0 ipv4.method manual ipv4.address 192.168.10.1/24
+sudo nmcli connection modify enp1s0 ipv4.method manual ipv4.addresses 192.168.10.1/24
 ```
 
 
