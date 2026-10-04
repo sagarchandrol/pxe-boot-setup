@@ -1,5 +1,5 @@
 # Network Topology: Virtual Bridge Setup
-- To allow broadcast-based DHCP and TFTP communication, a level-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain
+To allow broadcast-based DHCP and TFTP communication, a level-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain
 
 
 ```
@@ -26,3 +26,52 @@ This setup using **libvert** to manage linux bridge and virtual machine networki
 
 
 
+### Create a custom file pxe-net.xml with minimal settings
+Start with a `<network>` element with the name of the network device  
+Create a `<bridge>` element with the name of the bridge, set STP as enabled and delay to zero
+```
+<network>
+  <name>PXE-Net</name>
+  <bridge name='PXEbr0' stp='on' delay='0'/>
+</network>
+```
+
+
+### Define and Start the network device in `virsh` CLI interactive mode
+To run virsh in `qemu:///system` mode, user must either be a member of `wheel` group and/or `libvirt` group
+``` bash
+sudo virsh -c qemu:///system
+net-define /path/to/pxe-net.xml
+net-start PXEbr0
+net-autostart PXEbr0
+```
+**Check the network**  
+`ip link show PXEbr0`
+
+
+### Connect the network interface to the `server` virtual machine and `client` virtual machine
+*check whethter the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
+`sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///sesssion list --all`  
+virtual machines in my case runs in `qemu:///session mode`
+``` bash
+virsh -c qemu:///session edit <server vm name>
+```
+In the editor, either replace the `<interface>` element or create a new `<interface>` element
+```
+<interface type='bridge>
+  <source bridge='PXEbr0'/>
+  <model type='virtio'/>
+</interface>
+```
+Virtual machines run under normal user or (libvert-qemu) user, but creating a network TAP requires root privelge. So we use a binary called `qemu-bridge-helper`  
+```
+sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
+```
+This allows the binary to run as privleged user for the duration of the command  
+We will **whitelist the virtual bridge**
+```
+echo "allow PXEbr0" | sudo tee /etc/qemu/bridge.conf
+```
+
+
+*Now the server virtual machine is connected to the `bridge`, connect the **client virtual machine** as well to the bridge and we are done*
