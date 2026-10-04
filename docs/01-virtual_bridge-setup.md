@@ -50,7 +50,7 @@ net-autostart PXEbr0
 
 
 ### Connect the network interface to the `server` virtual machine and `client` virtual machine
-*check whethter the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
+check whethter the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
 `sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///sesssion list --all`  
 virtual machines in my case runs in `qemu:///session mode`
 ``` bash
@@ -68,10 +68,10 @@ Virtual machines run under normal user or (libvert-qemu) user, but creating a ne
 sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
 ```
 This allows the binary to run as privleged user for the duration of the command  
-We will **whitelist the virtual bridge**
+**whitelist the virtual bridge**
 ```
 echo "allow PXEbr0" | sudo tee /etc/qemu/bridge.conf
 ```
 
 
-*Now the server virtual machine is connected to the `bridge`, connect the **client virtual machine** as well to the bridge and we are done*
+*Now the **server virtual machine** is connected to the **bridge**, connect the **client virtual machine** as well to the bridge and we are done*
