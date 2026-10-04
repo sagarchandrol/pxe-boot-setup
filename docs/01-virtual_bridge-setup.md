@@ -19,7 +19,7 @@ _________________________________________________________________
 
 
 ## Prerequisites and Environment
-This setup using **libvert** to manage linux bridge and virtual machine networking. Ensure the following are available:
+This setup uses **libvert** to manage linux bridge and virtual machine networking. Ensure the following are available:
 - **Hyprevisor**: QEMU/KVM
 - **Management Tools**: `libvirt` daemon (libvertd) running with `virsh` CLI
 - **Privelges**: `sudo`/ROOT privelges for (qemu:///system) system networks
@@ -46,28 +46,28 @@ net-start PXEbr0
 net-autostart PXEbr0
 ```
 **Check the network**  
-`ip link show PXEbr0`
+```ip link show PXEbr0```
 
 
-### Connect the network interface to the `server` virtual machine and `client` virtual machine
+### Connect the network interface to the server virtual machine and client virtual machine
 check whethter the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
 `sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///sesssion list --all`  
 virtual machines in my case runs in `qemu:///session mode`
 ``` bash
 virsh -c qemu:///session edit <server vm name>
 ```
-In the editor, either replace the `<interface>` element or create a new `<interface>` element
+In the editor, either replace the existing `<interface>` element or create a new `<interface>` element
 ```
 <interface type='bridge>
   <source bridge='PXEbr0'/>
   <model type='virtio'/>
 </interface>
 ```
-Virtual machines run under normal user or (libvert-qemu) user, but creating a network TAP requires root privelge. So we use a binary called `qemu-bridge-helper`  
+Virtual machines run under normal user or (libvert-qemu) user, but creating a network TAP requires root privelge. So we use a binary called `qemu-bridge-helper` to temperorily run as privelged user for the duration of the network operations
 ```
 sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper
 ```
-This allows the binary to run as privleged user for the duration of the command  
+
 **whitelist the virtual bridge**
 ```
 echo "allow PXEbr0" | sudo tee /etc/qemu/bridge.conf
