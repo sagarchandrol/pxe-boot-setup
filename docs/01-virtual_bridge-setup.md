@@ -76,4 +76,23 @@ echo "allow PXEbr0" | sudo tee /etc/qemu/bridge.conf
 ```
 
 
-*Now the **server virtual machine** is connected to the **bridge**, connect the **client virtual machine** as well to the bridge and we are done*
+### Step 4: Install Client virtual machine
+To create client virtual machine, `virt-install` tool is being used. Install it if already not on your system  
+Note: Package Manager on my system is **apt**, change package manager in command line depending upon the system
+```
+sudo apt install virt-install
+```
+Client virtual machine can be installed in either `qemu:///session` mode or `qemu:///system` mode  
+If using `qemu:///system` then use prefix `sudo` before `virt-install` to grant **ROOT** privilege  
+Adjust **VM name**, **memory**, **vcpu**, disk **size** and **os-variant** as per your hardware and make sure to attach `--network` to your virtual bridge
+```
+virt-install --connect qemu:///session --name rhel8-client --memory 2048 --vcpu 2 --disk size=20,format=qcow2 --boot network,hd --os-variant rhl8.0 --network bridge=PXEbr0,model=virtio --noautoconsole --noreboot
+```
+Check the virtual machine status  
+Run the command with `sudo` privilege if VM was installed with `qemu:///system`
+```
+virsh list --all
+```
+
+
+*Now the **server** virtual machine and **clinet** virtual is connected to the **bridge** is setup and connected to the virtual bridge*

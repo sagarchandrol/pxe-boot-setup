@@ -1,10 +1,10 @@
 # Configuring PXE boot server for legacy BIOS (syslinux/RHEL8)
-When client virtual machine is powered on, it's NIC executes the PXE ROM to broadcast for a DHCP server.  
-It obtains IP address and instructions to pull the core bootloader `pxelinux.0` over TFTP.  
-After loading the core bootloader and menu config, it queries for **kernel** `vmlinuz` and **initial RAM Disk** `initrd.img` over TFTP.  
-The hardware switches from NIC ROM to linux kernel and the kernel mounts `initrd.img` as a temporary in-memory file system.  
-The system downloads  SquashFS runtime `install.img` over HTTP and mounts it as temporary root filesystem (/)  
-The installer runtime contains **Anaconda** which parses the kickstarter file `ks.cfg` and installs OS packages onto the targeted disk.
+- When client virtual machine is powered on, it's NIC executes the PXE ROM to broadcast for a DHCP server.  
+- It obtains IP address and instructions to pull the core bootloader `pxelinux.0` over TFTP.  
+- After loading the core bootloader and menu config, it queries for **kernel** `vmlinuz` and **initial RAM Disk** `initrd.img` over TFTP.  
+- The hardware switches from NIC ROM to linux kernel and the kernel mounts `initrd.img` as a temporary in-memory file system.  
+- The system downloads  SquashFS runtime `install.img` over HTTP and mounts it as temporary root filesystem (/)  
+- The installer runtime contains **Anaconda** which parses the kickstarter file `ks.cfg` and installs OS packages onto the targeted disk.
 
 
 
