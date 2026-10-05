@@ -95,4 +95,4 @@ virsh list --all
 ```
 
 TIP: If using graphical virtual managers like GNOME Boxes or virt-manager, ensure the virtual machine's prefrences are set "Run in Background" so the network installation is not suspended when switching windows  
-*Now the **server** virtual machine and **client** virtual machine is connected to the **bridge** is setup and connected to the virtual bridge*
+*Now the **server** virtual machine and **client** virtual machine is connected to the virtual bridge*
