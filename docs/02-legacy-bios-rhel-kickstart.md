@@ -124,6 +124,7 @@ sudo $EDITOR /var/www/html/ks.cfg
 ```  
 Add **keyboard layout**, **Timezone**,**system language**, **packages**, **username** & **password** to suit your environment. The values provided here are for reference and can be customized as needed  
 ```
+# Kickstart File
 text
 keyboard --xlayouts='us'
 lang en_US.UTF-8
