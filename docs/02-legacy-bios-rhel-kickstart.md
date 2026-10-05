@@ -79,6 +79,8 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 Mount the RHEL 8 DVD ISO to any path and copy `vmlinuz` & `initrd.img`  
 Note: The mount point for RHEL 8 DVD ISO on my system is `/mnt/iso/`
 ```
+sudo mkdir -p /mnt/iso
+sudo mount -o loop /path/of/RHEL-8_DVD.iso /mnt/iso
 sudo mkdir /var/lib/tftpboot/rhel8
 sudo cp /mnt/iso/images/pxeboot/{vmlinuz,initrd.img} /var/lib/tftpboot/rhel8
 ```
