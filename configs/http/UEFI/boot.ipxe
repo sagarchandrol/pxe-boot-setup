@@ -1,0 +1,7 @@
+#!ipxe
+
+kernel http://192.168.10.1/UEFI/wimboot
+initrd http://192.168.10.1/UEFI/win/bcd BCD
+initrd http://192.168.10.1/UEFI/win/boot.sdi boot.sdi
+initrd http://192.168.10.1/UEFI/win/boot.wim boot.wim
+boot
