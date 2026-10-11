@@ -1,3 +1,4 @@
+---
 ## Configuring PXE boot server for legacy BIOS (syslinux/RHEL8)
 - When client virtual machine is powered on, its NIC executes the PXE ROM to broadcast for a DHCP server.  
 - It obtains an IP address and instructions to pull the core bootloader `pxelinux.0` over TFTP.  
@@ -29,8 +30,10 @@
   ── `initrd.img` scripts fetch `ks.cfg`, `install.img` (SquashFS runtime)
       Downloads `.rpm` packages onto disk.
 ```
+---
 
 
+---
 ## Prerequisites and Environment  
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  
 - **Network & Installation Services**
@@ -53,9 +56,11 @@ sudo dnf install syslinux syslinux-tftpboot
 
 - **Operating System Media**
   - RHEL 8 DVD ISO mounted to provide (`vmlinuz`, `initrd.img`...)
+---
 
 
 
+---
 ### Step 1: Server base configuration (IP & Firewall)
 **Objective:**
 - **Static IP**: *Network services (DHCP, TFTP, HTTP) cannot run on dynamic host IPs. PXE clients expect a permanent, unchanging target IP across host reboots*
@@ -189,8 +194,10 @@ systemctl set-default graphical.target
 %end
 poweroff
 ```
+---
 
 
+---
 ### Test the PXE boot
 **Start and enable DHCP, TFTP and HTTP services**  
 ```
@@ -198,3 +205,4 @@ sudo systemctl enable --now httpd tftp dhcpd
 systemctl status httpd tftp dhcpd
 ```  
 With DHCP, TFTP and HTTP services configured and running, start the client virtual machine. Ensure its boot order is set to network boot (PXE) and it will automatically acquire an IP address, load the boot menu and begin unattended installation
+---

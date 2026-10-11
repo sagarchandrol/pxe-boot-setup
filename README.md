@@ -6,7 +6,7 @@ An enterprise-grade network boot (PXE) and unattended operating system installat
 
 ---
 
-## Roadmap & Features
+## Features
 
 * [x] Layer-2 virtual bridge creation with libvirt & unprivileged helper permissions (`qemu-bridge-helper`)
 * [x] DHCP Option 93 & Option 60 autodection (Legacy BIOS vs. UEFI)

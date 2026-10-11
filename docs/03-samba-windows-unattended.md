@@ -1,3 +1,4 @@
+---
 ## UEFI Network Boot (PXE) Architecture & Setup for Windows 10
 
 ### Overview & Architecture
@@ -13,6 +14,7 @@
 - `startnet.cmd` contains instructions to connect to samba server and maps the samba root directory as **Z:** drive
 - samba root directory i.e. `Z:` drive contains the extracted Windows ISO files (installer, binaries, sources and install.wim)
 - `Z:\setup.exe` installer is executed with the `autounattend.xml` file for a automated windows installation
+---
 
 
 ```
@@ -53,6 +55,7 @@
 ```
 
 
+---
 ## Prerequisites and Environment  
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  
 - **Network & Installation Services**
@@ -81,8 +84,10 @@ wget -O /var/www/html/win10/wimboot https://www.github.com/ipxe/wimboot/releases
 - **Operating System Media**
   - Windows 10 64-bit ISO mounted to extract full OS media and assets
   - Automated Answer File: `autounattend.xml` staged in samba share directory
+---
 
 
+---
 ### Step 1: Server base configuration (IP & Firewall)
 **Objective:**
 - **Static IP**: *Network services (DHCP, TFTP, HTTP, Samba) require a permanent, unchanging target IP across host reboots*
@@ -328,8 +333,10 @@ sudo $EDITOR /srv/samba/win10/autounattend.xml
 save and exit  
 
 Now the installation environment is ready, ensure all the services are up and running and test the boot  
+---
 
 
+---
 ### Test the PXE boot
 **Start and enable DHCP, TFTP, HTTP and Samba services**  
 ```
@@ -337,3 +344,4 @@ sudo systemctl enable --now httpd tftp dhcpd smb
 systemctl status httpd tftp dhcpd smb
 ```  
 With DHCP, TFTP, HTTP and Samba services configured and running, start the client virtual machine. Ensure its boot order is set to network boot (PXE) and it will automatically acquire an IP address, load the boot menu and begin unattended installation
+---

@@ -1,3 +1,4 @@
+---
 # Network Topology: Virtual Bridge Setup
 To allow broadcast-based DHCP and TFTP communication, a layer-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain.
 
@@ -16,16 +17,19 @@ _________________________________________________________________
 |        |_______________|              |_______________|       |
 |_______________________________________________________________|
 ```
+---
 
 
+---
 ## Prerequisites and Environment
 This setup uses **libvirt** to manage linux bridge and virtual machine networking. Ensure the following are available:
 - **Hypervisor**: QEMU/KVM
 - **Management Tools**: `libvirt` daemon (libvirtd) running with `virsh` CLI
 - **Privileges**: `sudo`/ROOT privilege for (qemu:///system) system networks
+---
 
 
-
+---
 ### Step 1: Create a custom file `pxe-net.xml` with minimal settings
 Start with a `<network>` element with the name of the network device  
 Create a `<bridge>` element with the name of the bridge, set STP as enabled and delay to zero
@@ -104,6 +108,10 @@ Run the command with `sudo` privilege if VM was installed with `qemu:///system`
 ```
 virsh list --all
 ```
+---
 
+
+---
 TIP: If using graphical virtual managers like GNOME Boxes or virt-manager, ensure the virtual machine's preferences are set "Run in Background" so the network installation is not suspended when switching windows  
 *Now the **server** virtual machine and **client** virtual machine are connected to the virtual bridge*
+---
