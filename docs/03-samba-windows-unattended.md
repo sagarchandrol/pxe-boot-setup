@@ -204,7 +204,9 @@ boot
 exit 1
 ```
 
-**Injecting `startnet.cmd` & `winpeshl.ini` into `boot.wim`**: By default when `boot.wim` filesystem is loaded it runs `setup.exe` in `X:` drive rather than `Z:` drive which we will be using as samba share point. For this we need to first, bring up the NIC of WinPE environment and mount samba share directory at `Z:` which can be achieved by injectiong a `startnet.cmd` script into `boot.wim` index 2. To run `startnet.cmd` at boot/mount, we need to create a config file named `winpeshl.ini` which launches any programs mentioned in it at boot or mount.  
+**Injecting `startnet.cmd` & `winpeshl.ini` into `boot.wim`**:  
+By default when `boot.wim` filesystem is loaded, it executes `setup.exe` from the `X:` drive rather than `Z:` drive, which we will be using as samba mount point.  
+To resolve this, we first need to initialize the NIC of WinPE environment and mount samba share directory at `Z:`. This can be achieved by injectiong a `startnet.cmd` script into `boot.wim` (index 2). To ensure our script runs at boot/mount, we need to create a config file named `winpeshl.ini` which launches any programs mentioned in it at boot or mount.  
 We will instruct `winpeshl.ini` to run `startnet.cmd` which will in turn mount samba share point (`Z:` drive) and bring up NIC  
 
 
