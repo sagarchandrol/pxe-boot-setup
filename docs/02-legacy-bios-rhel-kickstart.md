@@ -12,7 +12,7 @@
       │
       │ 1. DHCP DORA (UDP 67/68)
   DHCP Server (dhcpd)
-  ── Assigns IP + "Next-Server IP address" & "Bootfile info"
+  ── Assigns IP + "TFTP-Server IP address" & "Bootfile info"
       │
       │ 2. TFTP Fetch (UDP 69)
   TFTP Server (tftp-server)
@@ -57,6 +57,9 @@ sudo dnf install syslinux syslinux-tftpboot
 
 
 ### Step 1: Server base configuration (IP & Firewall)
+**Objective:**
+- **Static IP**: *Network services (DHCP, TFTP, HTTP) cannot run on dynamic host IPs. PXE clients expects a permanent, unchanging target IP accross host reboots*
+- **Firewall Rules**: *By default `firewalld` drops unsolicited inbound traffic. We must open **DHCP**, **TFTP** and **HTTP** so that client machines and VMs can reach the server.*
 
 
 NOTE: The network device name for the server is `enp1s0`  
@@ -74,6 +77,11 @@ sudo firewall-cmd --reload
 
 
 ### Step 2: DHCP service configuration  
+**Objective:**
+- **TFTP modules**: *We stage the syslinux network Bootstrap program `pxelinux.0` along with its helper COM32 modules (`menu.c32`, `ldlinux.c32`, `libcom32.c32` and `libutil.c32`) in `/var/lib/tftpboot/` so that the client can display an interactive boot menu over TFTP*
+- **DHCP Daemon**: *Allocate IP address to unconfigured clients and provide **option 66** (`next-server` i.e. TFTP server) and **option 67** (filename pointing to `pxelinux.0`)*
+
+
 copy or move `menu.c32`, `ldlinux.c32`, `libcom32.c32`, `libutil.c32`, `pxelinux.0` from `/tftpboot/` to the tftp server's root directory `/var/lib/tftpboot/`   
 ```
 sudo cp /tftpboot/{menu.c32,ldlinux.c32,libcom32.c32,libutil.c32,pxelinux.0} /var/lib/tftpboot/
@@ -99,6 +107,12 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 
 
 ### Step 3: TFTP Service & Bootloader Setup
+**Objective:**
+- **Bootloder Instructions (`default` menu)**: *Once `pxelinux.0` executes in client memory, it searches for configration file inside `pxelinux.cfg` directory. The `default` menu defines the Kernel and initial Ram parameters (`APPEND`) and points the installer to the `inst.repo` package repositories and `inst.ks` kickstarter file*
+- **Safe FallBack (`LOCALBOOT 0`)**: *Sets the bootloader timeout to fallback to the internal Disk incase no manual choice is made preventing re-installation loops onl existing machines*
+- **Staging Kernel and Initramfs**: *Raw network boot ROMs cannot access ISO files or packages directly. We extract `vmliuz` (linux kernel) and `initrd.img` (intial ram disk) into TFTP directory `/var/lib/tftpboot/rhel8/` so that the client can pull and extract and execute minimal installer runtime into RAM*
+
+
 Mount the RHEL 8 DVD ISO to any path and copy `vmlinuz` & `initrd.img`  
 Note: The mount point for RHEL 8 DVD ISO on my system is `/mnt/iso/`
 ```
@@ -134,6 +148,12 @@ LABEL local
 
 
 ### Step 4: HTTP service & Repositories (Anaconda/kickstart)
+**Objective:**
+- **HTTP package staging**: *TFTP uses UDP which is impractical for large multi-gigabyte package trees. Copying the repositories files (`Appstream`, `BaseOS`, `.treeinfo`) to `/var/www/html/rhel8` allows the anaconda to stream repositories packages over reliable, high-speed HTTP (TCP) connection*
+- **Automated Answer File (`ks.cfg`)**: *Automated installation require predetermined answers for partitioning, timezone, language, package group, credentials etc. Staging `ks.cfg` in web root directory allows complete automated, hands-free installation*
+- **Credential Security**: *Generating encrypted SHA-512 password hash via `openssl passwd -6` ensure root password and user password are never stored or shared in plaintext*
+
+
 Copy the `AppStream`, `BaseOS`, `images`, `.discinfo`, `RPM-GPG-KEY-redhat-beta`, `RPM-GPG-KEY-redhat-release`, `.treeinfo` from the mount point to the http root directory
 ```
 sudo mkdir /var/www/html/rhel8/
