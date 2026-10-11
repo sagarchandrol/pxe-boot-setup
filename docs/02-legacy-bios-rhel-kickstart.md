@@ -7,6 +7,29 @@
 - The installer runtime contains **Anaconda** which parses the kickstarter file `ks.cfg` and installs OS packages onto the targeted disk.
 
 
+```
+[ Client NIC ]
+      │
+      │ 1. DHCP DORA (UDP 67/68)
+  DHCP Server (dhcpd)
+  ── Assigns IP + "Next-Server IP address" & "Bootfile info"
+      │
+      │ 2. TFTP Fetch (UDP 69)
+  TFTP Server (tftp-server)
+  ── Sends raw bootloader (`pxelinux.0`), menu config (`default`)
+     Linux Kernel (`vmlinuz`), and Initial RAM Disk (`initrd.img`)
+      │
+      │ 3. Memory Boot & Stage Hand-off
+  Client RAM / Kernel space
+  ── Hardware switches from NIC ROM to Linux Kernel (`vmlinuz`)
+  ── Kernel mounts `initrd.img` as a temporary in-memory root filesystem
+      │
+      │ 4. HTTP Fetch (TCP 80)
+  HTTP Server (Apache httpd)
+  ── `initrd.img` scripts fetch `ks.cfg`, `install.img` (SquashFS runtime)
+      Downloads `.rpm` packages onto disk.
+```
+
 
 ## Prerequisites and Environment  
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  

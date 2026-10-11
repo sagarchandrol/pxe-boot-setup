@@ -1,5 +1,10 @@
 #!ipxe
 
+# The path for this file is /var/www/html/UEFI/boot.ipxe
+
+# The commands ran for label windows
+# Load kernel and initrd (ram disk)
+# Then boot with these loaded files
 kernel http://192.168.10.1/UEFI/wimboot
 initrd http://192.168.10.1/UEFI/win/bcd BCD
 initrd http://192.168.10.1/UEFI/win/boot.sdi boot.sdi
