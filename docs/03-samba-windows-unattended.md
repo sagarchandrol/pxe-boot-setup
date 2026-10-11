@@ -5,6 +5,7 @@
 
 ---
 ### Overview & Architecture
+---
 - When client machine is turned on, it's UEFI NIC ROM executes PXE over IPv4 to broadcast for a DHCP domain server
 - It obtains IP address from the DHCP server and address of the TFTP server with the filename of bootloader/s
 - After checking the vendor-class (PXEClient) and architecture-type (UEFI), The appropriate bootloader is downloaded over TFTP
@@ -17,7 +18,7 @@
 - `startnet.cmd` contains instructions to connect to samba server and maps the samba root directory as **Z:** drive
 - samba root directory i.e. `Z:` drive contains the extracted Windows ISO files (installer, binaries, sources and install.wim)
 - `Z:\setup.exe` installer is executed with the `autounattend.xml` file for a automated windows installation
----
+
 
 
 ```
@@ -60,7 +61,7 @@
 
 ---
 ## Prerequisites and Environment  
----
+
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  
 - **Network & Installation Services**
   - `dhcp-server` (`dhcpd`): To lease IP addresses and deliver PXE conditional boot options based on client Architecture (TFTP for raw UEFI, HTTP URI for IPXE)
