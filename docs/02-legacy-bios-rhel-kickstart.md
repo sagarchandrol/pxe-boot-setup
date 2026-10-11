@@ -6,6 +6,7 @@
 - The hardware switches from the NIC ROM to the Linux Kernel and the kernel mounts `initrd.img` as a temporary in-memory file system.  
 - The system downloads the  SquashFS runtime `install.img` over HTTP and mounts it as temporary root filesystem (/)  
 - The installer runtime contains **Anaconda** which parses the kickstart file `ks.cfg` and installs OS packages onto the targeted disk.
+---
 
 
 ```
@@ -30,11 +31,12 @@
   ── `initrd.img` scripts fetch `ks.cfg`, `install.img` (SquashFS runtime)
       Downloads `.rpm` packages onto disk.
 ```
----
+
 
 
 ---
 ## Prerequisites and Environment  
+---
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  
 - **Network & Installation Services**
   - `dhcp-server` (`dhcpd`): To lease IP addresses and deliver PXE boot options (Next Server & Filename)
@@ -56,12 +58,12 @@ sudo dnf install syslinux syslinux-tftpboot
 
 - **Operating System Media**
   - RHEL 8 DVD ISO mounted to provide (`vmlinuz`, `initrd.img`...)
----
 
 
 
 ---
 ### Step 1: Server base configuration (IP & Firewall)
+---
 **Objective:**
 - **Static IP**: *Network services (DHCP, TFTP, HTTP) cannot run on dynamic host IPs. PXE clients expect a permanent, unchanging target IP across host reboots*
 - **Firewall Rules**: *By default `firewalld` drops unsolicited inbound traffic. We must open **DHCP**, **TFTP** and **HTTP** so that client machines and VMs can reach the server.*
@@ -81,7 +83,9 @@ sudo firewall-cmd --reload
 ```
 
 
+---
 ### Step 2: DHCP service configuration  
+---
 **Objective:**
 - **TFTP modules**: *We stage the syslinux network bootstrap program `pxelinux.0` along with its helper COM32 modules (`menu.c32`, `ldlinux.c32`, `libcom32.c32` and `libutil.c32`) in `/var/lib/tftpboot/` so that the client can display an interactive boot menu over TFTP*
 - **DHCP Daemon**: *Allocate IP addresses to unconfigured clients and provide **Option 66** (`next-server` i.e. TFTP server) and **Option 67** (filename pointing to `pxelinux.0`)*
@@ -110,7 +114,9 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 ```
 
 
+---
 ### Step 3: TFTP Service & Bootloader Setup
+---
 **Objective:**
 - **Bootloader Instructions (`default` menu)**: *Once `pxelinux.0` executes in client memory, it searches for configuration file inside `pxelinux.cfg` directory. The `default` menu defines the Kernel and initial RAM parameters (`APPEND`) and points the installer to the `inst.repo` package repository and `inst.ks` kickstart file*
 - **Safe FallBack (`LOCALBOOT 0`)**: *Sets the bootloader timeout to fallback to the internal Disk in case no manual choice is made preventing reinstallation loops on existing machines*
@@ -151,7 +157,9 @@ LABEL local
 ```
 
 
+---
 ### Step 4: HTTP service & Repositories (Anaconda/kickstart)
+---
 **Objective:**
 - **HTTP package staging**: *TFTP uses UDP which is impractical for large multi-gigabyte package trees. Copying the repositories files (`AppStream`, `BaseOS`, `.treeinfo`) to `/var/www/html/rhel8` allows anaconda to stream repositories packages over reliable, high-speed HTTP (TCP) connection*
 - **Automated Answer File (`ks.cfg`)**: *Automated installation require predetermined answers for partitioning, timezone, language, package group, credentials etc. Staging `ks.cfg` in web root directory allows complete automated, hands-free installation*
@@ -197,7 +205,7 @@ poweroff
 ---
 
 
----
+
 ### Test the PXE boot
 **Start and enable DHCP, TFTP and HTTP services**  
 ```
@@ -205,4 +213,3 @@ sudo systemctl enable --now httpd tftp dhcpd
 systemctl status httpd tftp dhcpd
 ```  
 With DHCP, TFTP and HTTP services configured and running, start the client virtual machine. Ensure its boot order is set to network boot (PXE) and it will automatically acquire an IP address, load the boot menu and begin unattended installation
----

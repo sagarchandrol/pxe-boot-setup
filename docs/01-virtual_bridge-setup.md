@@ -17,7 +17,7 @@ _________________________________________________________________
 |        |_______________|              |_______________|       |
 |_______________________________________________________________|
 ```
----
+
 
 
 ---
@@ -26,11 +26,12 @@ This setup uses **libvirt** to manage linux bridge and virtual machine networkin
 - **Hypervisor**: QEMU/KVM
 - **Management Tools**: `libvirt` daemon (libvirtd) running with `virsh` CLI
 - **Privileges**: `sudo`/ROOT privilege for (qemu:///system) system networks
----
+
 
 
 ---
 ### Step 1: Create a custom file `pxe-net.xml` with minimal settings
+---
 Start with a `<network>` element with the name of the network device  
 Create a `<bridge>` element with the name of the bridge, set STP as enabled and delay to zero
 ```
@@ -40,8 +41,9 @@ Create a `<bridge>` element with the name of the bridge, set STP as enabled and 
 </network>
 ```
 
-
+---
 ### Step 2: Define and Start the network device in `virsh` CLI interactive mode
+---
 To run virsh in `qemu:///system` mode, user must either be a member of `wheel` group and/or `libvirt` group
 ``` bash
 sudo virsh -c qemu:///system
@@ -55,7 +57,9 @@ ip link show PXEbr0
 ```
 
 
+---
 ### Step 3: Connect the network interface to the server virtual machine and client virtual machine
+---
 check whether the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
 `sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///session list --all` to list virtual machines  
 virtual machines in my case run in `qemu:///session` mode
@@ -80,7 +84,9 @@ echo "allow PXEbr0" | sudo tee /etc/qemu/bridge.conf
 ```
 
 
+---
 ### Step 4: Install Client virtual machines (RHEL/Windows)
+---
 To create client virtual machine, `virt-install` tool is being used. Install it if already not on your system  
 Note: Package Manager on my system is **apt**, change package manager in command line depending upon the system
 ```
@@ -111,7 +117,5 @@ virsh list --all
 ---
 
 
----
 TIP: If using graphical virtual managers like GNOME Boxes or virt-manager, ensure the virtual machine's preferences are set "Run in Background" so the network installation is not suspended when switching windows  
 *Now the **server** virtual machine and **client** virtual machine are connected to the virtual bridge*
----

@@ -1,6 +1,9 @@
 ---
 ## UEFI Network Boot (PXE) Architecture & Setup for Windows 10
+---
 
+
+---
 ### Overview & Architecture
 - When client machine is turned on, it's UEFI NIC ROM executes PXE over IPv4 to broadcast for a DHCP domain server
 - It obtains IP address from the DHCP server and address of the TFTP server with the filename of bootloader/s
@@ -57,6 +60,7 @@
 
 ---
 ## Prerequisites and Environment  
+---
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  
 - **Network & Installation Services**
   - `dhcp-server` (`dhcpd`): To lease IP addresses and deliver PXE conditional boot options based on client Architecture (TFTP for raw UEFI, HTTP URI for IPXE)
@@ -84,11 +88,12 @@ wget -O /var/www/html/win10/wimboot https://www.github.com/ipxe/wimboot/releases
 - **Operating System Media**
   - Windows 10 64-bit ISO mounted to extract full OS media and assets
   - Automated Answer File: `autounattend.xml` staged in samba share directory
----
+
 
 
 ---
 ### Step 1: Server base configuration (IP & Firewall)
+---
 **Objective:**
 - **Static IP**: *Network services (DHCP, TFTP, HTTP, Samba) require a permanent, unchanging target IP across host reboots*
 - **Firewall Rules**: *Open **DHCP**(67 UDP), **TFTP**(69 UDP), **HTTP**(TCP 80) and **Samba**(TCP 445, UDP 137-138) so that client machines and VMs can communicate with every staging phase
@@ -108,7 +113,10 @@ sudo firewall-cmd --add-service=http --add-service=tftp --add-service=dhcp --add
 sudo firewall-cmd --reload
 ```
 
+
+---
 ### Step 2: DHCP service configuration  
+---
 **Objective:**
 - **Two Stage DHCP handoff**: *A UEFI PXE client sends an initial discover request without user-class. DHCP sends Option 67 pointing to filename `ipxe-x86_64.efi` over TFTP. when iPXE runs, it queries DHCP again with user-class `iPXE`, allowing DHCP to redirect it to `boot.ipxe` over HTTP*
 
@@ -154,7 +162,9 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 ```
 
 
+---
 ### Step 3: HTTP & WinPE image staging
+---
 **Objective:**
 - **Extract Boot Files**: *Windows boot binaries (`BCD`, `boot.sdi`, `boot.wim`) are extracted from Windows ISO and hosted on HTTP*  
 - **Inject Network Mount Script (`startnet.cmd`)**: *Windows PE booted over RAM does not know where installation media lives. Injecting a `winpeshl.ini` config file and `startnet.cmd` command script into index 2 of `boot.wim` forces WinPE to bring up NIC (`wpeinit`), mount the samba share `Z:` and start `setup.exe` unattended*  
@@ -251,7 +261,9 @@ virsh -c qemu:///session edit [vm name]
 ```
 
 
+---
 ### Step 4: Samba (SMB) share & Media Staging
+---
 **Objective:**
 - **Samba package staging**: *The multi-gigabyte `install.wim` and ISO root files are shared over SMB so `setup.exe` can pull installation layer directly during phase 2*  
 - **Automated Answer File (`autounattend.xml`)**: *Automated configuration file handling locale, generic windows version keys, language setting and initial local accounts*  
@@ -336,7 +348,7 @@ Now the installation environment is ready, ensure all the services are up and ru
 ---
 
 
----
+
 ### Test the PXE boot
 **Start and enable DHCP, TFTP, HTTP and Samba services**  
 ```
@@ -344,4 +356,3 @@ sudo systemctl enable --now httpd tftp dhcpd smb
 systemctl status httpd tftp dhcpd smb
 ```  
 With DHCP, TFTP, HTTP and Samba services configured and running, start the client virtual machine. Ensure its boot order is set to network boot (PXE) and it will automatically acquire an IP address, load the boot menu and begin unattended installation
----
