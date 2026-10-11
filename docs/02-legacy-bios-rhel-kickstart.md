@@ -1,5 +1,5 @@
 ## Configuring PXE boot server for legacy BIOS (syslinux/RHEL8)
-- When client virtual machine is powered on, its NICs executes the PXE ROM to broadcast for a DHCP server.  
+- When client virtual machine is powered on, its NIC executes the PXE ROM to broadcast for a DHCP server.  
 - It obtains an IP address and instructions to pull the core bootloader `pxelinux.0` over TFTP.  
 - After loading the core bootloader and menu config, it queries for **kernel** `vmlinuz` and **initial RAM Disk** `initrd.img` over TFTP.  
 - The hardware switches from the NIC ROM to the Linux Kernel and the kernel mounts `initrd.img` as a temporary in-memory file system.  
@@ -101,15 +101,14 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 # address of the tftp server
        next-server 192.168.10.1;
 # add the filepath of pxelinux.0 relative to the tftp root directory
-       filename "pxelinux.0";
-}
+       filename "pxelinux.0";}
 ```
 
 
 ### Step 3: TFTP Service & Bootloader Setup
 **Objective:**
-- **Bootloader Instructions (`default` menu)**: *Once `pxelinux.0` executes in client memory, it searches for configuration file inside `pxelinux.cfg` directory. The `default` menu defines the Kernel and initial RAM parameters (`APPEND`) and points the installer to the `inst.repo` package repositories and `inst.ks` kickstart file*
-- **Safe FallBack (`LOCALBOOT 0`)**: *Sets the bootloader timeout to fallback to the internal Disk incase no manual choice is made preventing re-installation loops on existing machines*
+- **Bootloader Instructions (`default` menu)**: *Once `pxelinux.0` executes in client memory, it searches for configuration file inside `pxelinux.cfg` directory. The `default` menu defines the Kernel and initial RAM parameters (`APPEND`) and points the installer to the `inst.repo` package repository and `inst.ks` kickstart file*
+- **Safe FallBack (`LOCALBOOT 0`)**: *Sets the bootloader timeout to fallback to the internal Disk in case no manual choice is made preventing reinstallation loops on existing machines*
 - **Staging Kernel and Initramfs**: *Raw network boot ROMs cannot access ISO files or packages directly. We extract `vmlinuz` (Linux Kernel) and `initrd.img` (initial RAM disk) into TFTP directory `/var/lib/tftpboot/rhel8/` so that the client can pull and extract and execute minimal installer runtime into RAM*
 
 

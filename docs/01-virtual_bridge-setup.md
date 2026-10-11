@@ -1,5 +1,5 @@
 # Network Topology: Virtual Bridge Setup
-To allow broadcast-based DHCP and TFTP communication, a level-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain
+To allow broadcast-based DHCP and TFTP communication, a layer-2 virtual bridge is used to connect both the server and client virtual machines within the same broadcast domain.
 
 
 ```
@@ -105,5 +105,5 @@ Run the command with `sudo` privilege if VM was installed with `qemu:///system`
 virsh list --all
 ```
 
-TIP: If using graphical virtual managers like GNOME Boxes or virt-manager, ensure the virtual machine's prefrences are set "Run in Background" so the network installation is not suspended when switching windows  
-*Now the **server** virtual machine and **client** virtual machine is connected to the virtual bridge*
+TIP: If using graphical virtual managers like GNOME Boxes or virt-manager, ensure the virtual machine's preferences are set "Run in Background" so the network installation is not suspended when switching windows  
+*Now the **server** virtual machine and **client** virtual machine are connected to the virtual bridge*

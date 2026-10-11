@@ -5,10 +5,10 @@
 - It obtains IP address from the DHCP server and address of the TFTP server with the filename of bootloader/s
 - After checking the vendor-class (PXEClient) and architecture-type (UEFI), The appropriate bootloader is downloaded over TFTP
 - Bootloader `ipxe-x86_64.efi` is executed in memory and broadcasts a DHCP Request to the server
-- IPXE downloads the `boot.ipxe` menu file over HTTP  which contains the **kernel** and **initial Ram Disk** addresses
-- Kernel `wimboot`, initial Ram Disk `BCD`, `boot.sdi`, `boot.wim` are loaded over HTTP
+- IPXE downloads the `boot.ipxe` menu file over HTTP  which contains the **kernel** and **initiall RAM Disk** addresses
+- Kernel `wimboot`, initial RAM Disk `BCD`, `boot.sdi`, `boot.wim` are loaded over HTTP
 - `BCD` contains the boot menu entries, `boot.sdi` contains the binary to mount `boot.wim` which contains the filesystem in RAM
-- **WinPE** i.e. kernel or minimal environment is booted in Ram Disk and the filesystem (boot.wim) it mounted as **X:** drive
+- **WinPE** i.e. kernel or minimal environment is booted in Ram Disk and the filesystem (boot.wim) is mounted as **X:** drive
 - **X:** drive contains **winpeshl.ini** config file, This config file invokes `startnet.cmd` which initializes network card
 - `startnet.cmd` contains instructions to connect to samba server and maps the samba root directory as **Z:** drive
 - samba root directory i.e. `Z:` drive contains the extracted Windows ISO files (installer, binaries, sources and install.wim)
@@ -60,7 +60,7 @@ Before configuring the services, please ensure the following packages and resour
   - `tftp-server`: To host initial UEFI bootloader (ipxe-x86_64.efi)
   - `httpd` (Apache): To serve `wimboot`, the WindowsPE ramdisk files (`BCD`, `boot.sdi`, `boot.wim`) and the `boot.ipxe` script
   - `samba` or `samba-client` (`smb`): To host the full windows installation tree (`setup.exe`, `install.wim` and repositories sources) over SMB (Server Message Block)
-  - `wimblib-utils`: To inspect, modify and inject custom scripts into `boot.wim` on Linux without Windows toosl
+  - `wimblib-utils`: To inspect, modify and inject custom scripts into `boot.wim` on Linux without Windows tools
 ```
 # Install them using
 sudo dnf install epel-release
@@ -72,7 +72,7 @@ sudo dnf install httpd tftp dhcp-server samba wimlib-utils
   - Windows PE Boot Helper: `wimboot`
 
 ```
-# Download iPXE binary and wimboot executble
+# Download iPXE binary and wimboot executable
 sudo mkdir -p /var/lib/tftpboot/win10 /var/www/html/win10
 wget -O /var/lib/tftpboot/win10/ipxe-x86_64.efi https://www.boot.ipxe.org/x84_64-efi/ipxe.efi
 wget -O /var/www/html/win10/wimboot https://www.github.com/ipxe/wimboot/releases/latest/download/wimboot
@@ -105,7 +105,7 @@ sudo firewall-cmd --reload
 
 ### Step 2: DHCP service configuration  
 **Objective:**
-- **Two Stage DCHP handoff**: *A UEFI PXE client sends an initial discover request without user-class. DHCP sends Option 67 pointing to filename `ipxe-x86_64.efi` over TFTP. when iPXE runs, it queries DHCP again with user-class `iPXE`, allowing DHCP to redirect it to `boot.ipxe` over HTTP*
+- **Two Stage DHCP handoff**: *A UEFI PXE client sends an initial discover request without user-class. DHCP sends Option 67 pointing to filename `ipxe-x86_64.efi` over TFTP. when iPXE runs, it queries DHCP again with user-class `iPXE`, allowing DHCP to redirect it to `boot.ipxe` over HTTP*
 
 
 Edit the dhcp configuration file at `/etc/dhcp/dhcpd.conf`
@@ -114,7 +114,7 @@ sudo $EDITOR /etc/dhcp/dhcpd.conf
 ```
 
 
-Add the following configration
+Add the following configuration
 ```
 # creating a custom DHCP option definition of 16 bits (2 bytes) whole integer
 # we can use this later to identify the architecture type of client (BIOS/UEFI)
@@ -124,8 +124,8 @@ class "PXEClient" {
 # length of PXEClient is 9 characters, hence (0, 9)
       match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
 # second handoff, triggers after ipxe-x86_64.efi has been passed
-# ipxe queries for configration file with option 77
-# DHCP provides the addresss for boot.ipxe
+# ipxe queries for configuration file with option 77
+# DHCP provides the address for boot.ipxe
       if exists user-class and option user-class = "iPXE" {
       filename "http://192.168.10.1/win10/boot.ipxe";
       }
@@ -174,7 +174,7 @@ sudo chmod -R 755 /var/www/html/win10/
 sudo $EDITOR /var/www/html/win10/boot.ipxe
 ```
 
-Add the following configration inside the `boot.ipxe`  
+Add the following configuration inside the `boot.ipxe`  
 Remove comments from the text except line 1 (`#!ipxe`)  
 ```
 #!ipxe
@@ -206,7 +206,7 @@ exit 1
 
 **Injecting `startnet.cmd` & `winpeshl.ini` into `boot.wim`**:  
 By default when `boot.wim` filesystem is loaded, it executes `setup.exe` from the `X:` drive rather than `Z:` drive, which we will be using as samba mount point.  
-To resolve this, we first need to initialize the NIC of WinPE environment and mount samba share directory at `Z:`. This can be achieved by injectiong a `startnet.cmd` script into `boot.wim` (index 2). To ensure our script runs at boot/mount, we need to create a config file named `winpeshl.ini` which launches any programs mentioned in it at boot or mount.  
+To resolve this, we first need to initialize the NIC of WinPE environment and mount samba share directory at `Z:`. This can be achieved by injecting a `startnet.cmd` script into `boot.wim` (index 2). To ensure our script runs at boot/mount, we need to create a config file named `winpeshl.ini` which launches any programs mentioned in it at boot or mount.  
 We will instruct `winpeshl.ini` to run `startnet.cmd` which will in turn mount samba share point (`Z:` drive) and bring up NIC  
 
 
@@ -232,9 +232,9 @@ sudo wimunmount /mnt/iso --commit
 Inside the `startnet.cmd` script is a custom text file for `diskpart` which will clean and partition the disk. The syntax for it is explained below
 
 
-### Additonal Step: Changing interface model of Virtual Bridge
+### Additional Step: Changing interface model of Virtual Bridge
 In Hypervisor like QEMU/KVM, virtIO acts as an abstraction standard for virtualized I/O devices. By default, windows does not have drivers for virtIO. We need to either use a workaround i.e. `e1000e` which is an emulation for Intel 82574L Gigabit NIC or load the drivers for `virtIO` into the `boot.wim` file.  
-I am using the former method i.e. switching NIC model to `e1000e`. Use `qemu///:session` if Virtual machine is located in your home directory; otherwise, use `qemu:///system` with root privelege  
+I am using the former method i.e. switching NIC model to `e1000e`. Use `qemu///:session` if Virtual machine is located in your home directory; otherwise, use `qemu:///system` with root privilege  
 ```
 virsh -c qemu:///session edit [vm name]
 # go to interface section and change model type form 'virtio' to 'e1000e'
@@ -260,7 +260,7 @@ sudo cp /mnt/iso/* /srv/samba/win10/
 sudo chmod -R 755 /srv/samba/win10/
 ```
 
-Generate a `autounattend.xml` answer file from Windows 10 generater online at https://www.schneegans.de/windows/unattend-generator or any other source as per your need.  
+Generate a `autounattend.xml` answer file from Windows 10 generator online at https://www.schneegans.de/windows/unattend-generator or any other source as per your need.  
 Use the generic key windows version key in the generator. `M7XTQ-FN8P6-TTKYV-9D4CC-J462D` is the key for windows 10 enterprise ltsc 2021 or use any other key suitable for your windows version  
 Note: Disable the (**Generate a .cmd script to handle WinPE stage**) option as the generated script expects `setup.exe` in `X:` instead of our mounted samba share. Instead we use our own WinPE routine to execute a custom `diskpart.txt` for partitioning and run `setup.exe`  
 Copy or move the generated `autounattend.xml` to samba share directory `/srv/samba/win10/`  
@@ -271,7 +271,7 @@ sudo cp /path/of/autounattend.xml /srv/samba/win10/
 
 Create a custom `diskpart.txt` for partitioning and place it inside samba share
 ```
-sudo cat > /srv/samba/win10/ << 'EOF'
+sudo cat > /srv/samba/win10/diskpart.txt << 'EOF'
 SELECT DISK=0
 CLEAN
 CONVERT GPT
@@ -327,7 +327,7 @@ sudo $EDITOR /srv/samba/win10/autounattend.xml
 ```
 save and exit  
 
-Now the installation enviroment is ready, ensure all the services are up and running and test the boot  
+Now the installation environment is ready, ensure all the services are up and running and test the boot  
 
 
 ### Test the PXE boot
