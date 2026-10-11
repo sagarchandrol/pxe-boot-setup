@@ -6,6 +6,7 @@ An enterprise-grade network boot (PXE) and unattended operating system installat
 
 ---
 
+---
 
 ## Roadmap & Features
 
@@ -17,17 +18,18 @@ An enterprise-grade network boot (PXE) and unattended operating system installat
 * [x] Samba (SMB) guest share integration for raw Windows ISO installation media
 * [x] Custom WinPE image modification (`winpeshl.ini`, `startnet.cmd`, and `diskpart.txt` injected into `boot.wim`)
 
+---
 
 ### Architecture Overview
 
 ```text
-                      +-----------------------------+
-                      |   Layer-2 Virtual Bridge    |
-                      |          (PXEbr0)           |
-                      +--------------+--------------+
-                                     |
-           +-------------------------+-------------------------+
-           |                                                   |
+                      +-----------------------------+                      
+                      |   Layer-2 Virtual Bridge    |                      
+                      |          (PXEbr0)           |                      
+                      +--------------+--------------+                      
+                                     |                                     
+           +-------------------------+-------------------------+           
+           |                                                   |           
 +----------v-----------+                             +---------v----------+
 |      Server VM       |                             |     Client VM      |
 |     192.168.10.1     |                             |     DHCP Client    |
