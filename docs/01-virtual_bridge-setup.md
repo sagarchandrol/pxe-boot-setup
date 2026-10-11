@@ -85,6 +85,8 @@ sudo apt install virt-install
 Client virtual machine can be installed in either `qemu:///session` mode or `qemu:///system` mode  
 If using `qemu:///system` then use prefix `sudo` before `virt-install` to grant **ROOT** privilege  
 Adjust **VM name**, **memory**, **vcpu** and **disk size** as per your hardware and make sure to attach `--network` to your virtual bridge  
+
+
 Install RHEL client virtual machine
 ```
 virt-install --connect qemu:///session --name rhel8-client --memory 2048 --vcpu 2 --disk size=20,format=qcow2 --boot network,hd --os-variant rhl8.0 --network bridge=PXEbr0,model=virtio --noautoconsole --noreboot
