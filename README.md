@@ -9,8 +9,8 @@ An enterprise-grade network boot (PXE) and unattended operating system installat
 ## Features
 
 * [x] Layer-2 virtual bridge creation with libvirt & unprivileged helper permissions (`qemu-bridge-helper`)
-* [x] DHCP Option 93 & Option 60 autodection (Legacy BIOS vs. UEFI)
 * [x] Legacy BIOS network boot pipeline (`pxelinux.0` + Syslinux modules)
+* [x] DHCP Option 93 & Option 60 autodection (Legacy BIOS vs. UEFI)
 * [x] Hands-free RHEL 8 automated deployment via Kickstart (`ks.cfg`)
 * [x] Two-stage UEFI iPXE chaining over HTTP (`wimboot`)
 * [x] Samba (SMB) guest share integration for raw Windows ISO installation media
@@ -60,7 +60,7 @@ Configuring isolated bridge networking in libvirt, bridging helpers for unprivil
 2. **[02. Legacy BIOS RHEL 8 Kickstart](https://github.com/sagarchandrol/pxe-boot-setup/blob/main/docs/02-legacy-bios-rhel-kickstart.md)**
 Configuring `dhcpd`, Syslinux COM32 modules, TFTP boot staging, and Anaconda Kickstart installation over HTTP.
 3. **[03. Windows 10 Unattended Setup via Samba](https://github.com/sagarchandrol/pxe-boot-setup/blob/main/docs/03-samba-windows-unattended.md)**
-Staging `wimboot` + iPXE over HTTP, injecting startup scripts into `boot.wim` using `wimlib-imagex`, configuring anonymous Samba guest shares, and automated disk partitioning.
+Staging `wimboot` + iPXE over HTTP, injecting startup scripts into `boot.wim` using `wimlib-utils`, configuring anonymous Samba guest shares, and automated disk partitioning.
 
 ---
 
