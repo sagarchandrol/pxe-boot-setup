@@ -36,7 +36,7 @@
 
 ---
 ## Prerequisites and Environment  
----
+
 Before configuring the services, please ensure the following packages and resources are available on the server host/VM  
 - **Network & Installation Services**
   - `dhcp-server` (`dhcpd`): To lease IP addresses and deliver PXE boot options (Next Server & Filename)
