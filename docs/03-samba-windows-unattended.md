@@ -112,6 +112,8 @@ Edit the dhcp configuration file at `/etc/dhcp/dhcpd.conf`
 ```
 sudo $EDITOR /etc/dhcp/dhcpd.conf
 ```
+
+
 Add the following configration
 ```
 # creating a custom DHCP option definition of 16 bits (2 bytes) whole integer
@@ -149,12 +151,12 @@ subnet 192.168.10.0 netmask 255.255.255.0 {
 
 ### Step 3: HTTP & WinPE image staging
 **Objective:**
-- **Extract Boot Files**: *Windows boot binaries (`BCD`, `boot.sdi`, `boot.wim`) are extracted from Windows ISO and hosted on HTTP*
-- **Inject Network Mount Script (`startnet.cmd`)**: *Windows PE booted over RAM does not know where installation media lives. Injecting a `winpeshl.ini` config file and `startnet.cmd` command script into index 2 of `boot.wim` forces WinPE to bring up NIC (`wpeinit`), mount the samba share `Z:` and start `setup.exe` unattended*
+- **Extract Boot Files**: *Windows boot binaries (`BCD`, `boot.sdi`, `boot.wim`) are extracted from Windows ISO and hosted on HTTP*  
+- **Inject Network Mount Script (`startnet.cmd`)**: *Windows PE booted over RAM does not know where installation media lives. Injecting a `winpeshl.ini` config file and `startnet.cmd` command script into index 2 of `boot.wim` forces WinPE to bring up NIC (`wpeinit`), mount the samba share `Z:` and start `setup.exe` unattended*  
 
 
-mount the Windows 10 ISO to any path and copy `bcd`, `boot.sdi` & `boot.wim`
-Note: The mount point for Windows 10 ISO on my system is `/mnt/winiso/`
+mount the Windows 10 ISO to any path and copy `bcd`, `boot.sdi` & `boot.wim`  
+Note: The mount point for Windows 10 ISO on my system is `/mnt/winiso/`  
 ```
 sudo mkdir -p /mnt/winiso
 sudo mount -o loop /path/of/Windows-10.iso /mnt/winiso
@@ -163,17 +165,17 @@ sudo cp /mnt/winiso/efi/microsoft/boot/bcd /var/www/html/win10/
 sudo cp /mnt/winiso/boot/boot.sdi /var/www/html/win10/
 sudo cp /mnt/winiso/sources/boot.wim /var/www/html/win10/
 ```
-Create and edit `boot.ipxe` config file for iPXE bootloader
-Make sure the DHCP user-class points to `boot.ipxe`
-Make sure the addresses inside `boot.ipxe` point to `wimboot`, `bcd`, `boot.sdi` and `boot.wim`
+Create and edit `boot.ipxe` config file for iPXE bootloader  
+Make sure the DHCP user-class points to `boot.ipxe`  
+Make sure the addresses inside `boot.ipxe` point to `wimboot`, `bcd`, `boot.sdi` and `boot.wim`  
 ```
 sudo touch /var/www/html/win10/boot.ipxe
 sudo chmod -R 755 /var/www/html/win10/
 sudo $EDITOR /var/www/html/win10/boot.ipxe
 ```
 
-Add the following configration inside the `boot.ipxe`
-Remove comments from the text except line 1 (`#!ipxe`)
+Add the following configration inside the `boot.ipxe`  
+Remove comments from the text except line 1 (`#!ipxe`)  
 ```
 #!ipxe
 # above line is shebang calls the ipxe program
@@ -202,10 +204,12 @@ boot
 exit 1
 ```
 
-**Injecting `startnet.cmd` & `winpeshl.ini` into `boot.wim`**: By default when `boot.wim` filesystem is loaded it runs `setup.exe` in `X:` drive rather than `Z:` drive which we will be using as samba share point. For this we need to first, bring up the NIC of WinPE environment and mount samba share directory at `Z:` which can be achieved by injectiong a `startnet.cmd` script into `boot.wim` index 2. To run `startnet.cmd` at boot/mount, we need to create a config file named `winpeshl.ini` which launches any programs mentioned in it at boot or mount.
-We will instruct `winpeshl.ini` to run `startnet.cmd` which will in turn mount samba share point (`Z:` drive) and bring up NIC
+**Injecting `startnet.cmd` & `winpeshl.ini` into `boot.wim`**: By default when `boot.wim` filesystem is loaded it runs `setup.exe` in `X:` drive rather than `Z:` drive which we will be using as samba share point. For this we need to first, bring up the NIC of WinPE environment and mount samba share directory at `Z:` which can be achieved by injectiong a `startnet.cmd` script into `boot.wim` index 2. To run `startnet.cmd` at boot/mount, we need to create a config file named `winpeshl.ini` which launches any programs mentioned in it at boot or mount.  
+We will instruct `winpeshl.ini` to run `startnet.cmd` which will in turn mount samba share point (`Z:` drive) and bring up NIC  
+
 
 NOTE: *The mount point for `boot.wim` is /mnt/iso in my system, change path accordingly*
+
 
 ```
 sudo mkdir /mnt/iso
@@ -224,9 +228,11 @@ EOF
 sudo wimunmount /mnt/iso --commit
 ```
 Inside the `startnet.cmd` script is a custom text file for `diskpart` which will clean and partition the disk. The syntax for it is explained below
+
+
 ### Additonal Step: Changing interface model of Virtual Bridge
 In Hypervisor like QEMU/KVM, virtIO acts as an abstraction standard for virtualized I/O devices. By default, windows does not have drivers for virtIO. We need to either use a workaround i.e. `e1000e` which is an emulation for Intel 82574L Gigabit NIC or load the drivers for `virtIO` into the `boot.wim` file.  
-I am using the former method i.e. switching NIC model to `e1000e`. Use `qemu///:session` if Virtual machine is located in your home directory; otherwise, use `qemu:///system` with root privelege
+I am using the former method i.e. switching NIC model to `e1000e`. Use `qemu///:session` if Virtual machine is located in your home directory; otherwise, use `qemu:///system` with root privelege  
 ```
 virsh -c qemu:///session edit [vm name]
 # go to interface section and change model type form 'virtio' to 'e1000e'
@@ -240,8 +246,8 @@ virsh -c qemu:///session edit [vm name]
 
 ### Step 4: Samba (SMB) share & Media Staging
 **Objective:**
-- **Samba package staging**: *The multi-gigabyte `install.wim` and ISO root files are shared over SMB so `setup.exe` can pull installation layer directly during phase 2*
-- **Automated Answer File (`autounattend.xml`)**: *Automated configuration file handling locale, generic windows version keys, language setting and initial local accounts*
+- **Samba package staging**: *The multi-gigabyte `install.wim` and ISO root files are shared over SMB so `setup.exe` can pull installation layer directly during phase 2*  
+- **Automated Answer File (`autounattend.xml`)**: *Automated configuration file handling locale, generic windows version keys, language setting and initial local accounts*  
 
 
 Create the samba share directly and copy all Windows ISO contents
@@ -252,9 +258,9 @@ sudo cp /mnt/iso/* /srv/samba/win10/
 sudo chmod -R 755 /srv/samba/win10/
 ```
 
-Generate a `autounattend.xml` answer file from Windows 10 generater online at https://www.schneegans.de/windows/unattend-generator or any other source as per your need.
-Use the generic key windows version key in the generator. `M7XTQ-FN8P6-TTKYV-9D4CC-J462D` is the key for windows 10 enterprise ltsc 2021 or use any other key suitable for your windows version
-Note: Disable the (**Generate a .cmd script to handle WinPE stage**) option as the generated script expects `setup.exe` in `X:` instead of our mounted samba share. Instead we use our own WinPE routine to execute a custom `diskpart.txt` for partitioning and run `setup.exe`
+Generate a `autounattend.xml` answer file from Windows 10 generater online at https://www.schneegans.de/windows/unattend-generator or any other source as per your need.  
+Use the generic key windows version key in the generator. `M7XTQ-FN8P6-TTKYV-9D4CC-J462D` is the key for windows 10 enterprise ltsc 2021 or use any other key suitable for your windows version  
+Note: Disable the (**Generate a .cmd script to handle WinPE stage**) option as the generated script expects `setup.exe` in `X:` instead of our mounted samba share. Instead we use our own WinPE routine to execute a custom `diskpart.txt` for partitioning and run `setup.exe`  
 Copy or move the generated `autounattend.xml` to samba share directory `/srv/samba/win10/`  
 ```
 sudo cp /path/of/autounattend.xml /srv/samba/win10/
@@ -317,9 +323,9 @@ sudo $EDITOR /srv/samba/win10/autounattend.xml
   </OSImage>
 </ImageInstall>
 ```
-save and exit
+save and exit  
 
-Now the installation enviroment is ready, ensure all the services are up and running and test the boot
+Now the installation enviroment is ready, ensure all the services are up and running and test the boot  
 
 
 ### Test the PXE boot
