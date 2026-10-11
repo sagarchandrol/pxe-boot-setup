@@ -6,8 +6,6 @@ An enterprise-grade network boot (PXE) and unattended operating system installat
 
 ---
 
----
-
 ## Roadmap & Features
 
 * [x] Layer-2 virtual bridge creation with libvirt & unprivileged helper permissions (`qemu-bridge-helper`)
