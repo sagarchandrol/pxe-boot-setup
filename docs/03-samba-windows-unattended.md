@@ -1,7 +1,6 @@
 ## UEFI Network Boot (PXE) Architecture & Setup for Windows 10
 
 
-
 ---
 ### Overview & Architecture
 ---
@@ -343,9 +342,6 @@ sudo $EDITOR /srv/samba/win10/autounattend.xml
 </ImageInstall>
 ```
 save and exit  
----
-
-
 Now the installation environment is ready, ensure all the services are up and running and test the boot  
 
 
