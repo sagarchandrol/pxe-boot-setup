@@ -65,7 +65,7 @@ sudo dnf install syslinux syslinux-tftpboot
 ### Step 1: Server base configuration (IP & Firewall)
 ---
 **Objective:**
-- **Static IP**: *Network services (DHCP, TFTP, HTTP) cannot run on dynamic host IPs. PXE clients expect a permanent, unchanging target IP across host reboots*
+- **Static IP**: *Setting a static IP for network services (DHCP, TFTP, HTTP) as these cannot run on dynamic host IPs. PXE clients expect a permanent, unchanging target IP across host reboots*
 - **Firewall Rules**: *By default `firewalld` drops unsolicited inbound traffic. We must open **DHCP**, **TFTP** and **HTTP** so that client machines and VMs can reach the server.*
 
 

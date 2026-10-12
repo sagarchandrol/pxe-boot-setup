@@ -32,6 +32,9 @@ This setup uses **libvirt** to manage linux bridge and virtual machine networkin
 ---
 ### Step 1: Create a custom file `pxe-net.xml` with minimal settings
 ---
+Create a minimal tempelate file for virsh CLI so that virsh CLI knows the type of network device to be created  
+
+
 Start with a `<network>` element with the name of the network device  
 Create a `<bridge>` element with the name of the bridge, set STP as enabled and delay to zero
 ```
@@ -44,6 +47,9 @@ Create a `<bridge>` element with the name of the bridge, set STP as enabled and 
 ---
 ### Step 2: Define and Start the network device in `virsh` CLI interactive mode
 ---
+Use the tempelate file `pxe-net.xml` to define and create a new network device (bridge)  
+
+
 To run virsh in `qemu:///system` mode, user must either be a member of `wheel` group and/or `libvirt` group
 ``` bash
 sudo virsh -c qemu:///system
@@ -60,6 +66,8 @@ ip link show PXEbr0
 ---
 ### Step 3: Connect the network interface to the server virtual machine and client virtual machine
 ---
+Pre-existing VMs require adding virtual bridge manually by editing the configuration file
+
 check whether the virtual machines run in `qemu:///session` mode or `qemu:///system` mode  
 `sudo virsh -c qemu:///system list --all` or `virsh -c qemu:///session list --all` to list virtual machines  
 virtual machines in my case run in `qemu:///session` mode
@@ -73,6 +81,9 @@ In the editor, either replace the existing `<interface>` element or create a new
   <model type='virtio'/>
 </interface>
 ```
+
+
+
 Virtual machines run under normal user or (libvirt-qemu) user, but creating a network TAP requires root privilege. So we use a binary called `qemu-bridge-helper` to temporarily run as privileged user for the duration of the network operations
 ```
 sudo chmod u+s /usr/lib/qemu/qemu-bridge-helper

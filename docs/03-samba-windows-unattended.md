@@ -1,8 +1,5 @@
-## UEFI Network Boot (PXE) Architecture & Setup for Windows 10
-
-
 ---
-### Overview & Architecture
+## UEFI Network Boot (PXE) Architecture & Setup for Windows 10
 ---
 - When client machine is turned on, it's UEFI NIC ROM executes PXE over IPv4 to broadcast for a DHCP domain server
 - It obtains IP address from the DHCP server and address of the TFTP server with the filename of bootloader/s
