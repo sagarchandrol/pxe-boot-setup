@@ -131,32 +131,34 @@ Add the following configuration
 # creating a custom DHCP option definition of 16 bits (2 bytes) whole integer
 # we can use this later to identify the architecture type of client (BIOS/UEFI)
 option architecture-type code 93 = unsigned integer 16;
+
 class "PXEClient" {
 # match option 60 class ID signify the platform of the client (pxeclient/android...)
 # length of PXEClient is 9 characters, hence (0, 9)
       match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
+# option 93 architecture-type usage
+# 00:07 and 00:09 for x86_64 efi
+      if option architecture-type = 00:07 or option architecture-type = 00:09 {
 # second handoff, triggers after ipxe-x86_64.efi has been passed
 # ipxe queries for configuration file with option 77
 # DHCP provides the address for boot.ipxe
       if exists user-class and option user-class = "iPXE" {
-      filename "http://192.168.10.1/win10/boot.ipxe";
-      }
-# option 93 architecture-type usage
-# 00:07 and 00:09 for x86_64 efi
-      else if option architecture-type = 00:07 or option architecture-type = 00:09 {
-      filename "win10/ipxe-x86_64.efi";
-      }
+      filename "http://192.168.10.1/win10/boot.ipxe";}
+# if option 77 does not satify, pass initial bootloader
       else {
+      filename "win10/ipxe-x86_64.efi";}}
 # rest of the architecture-type in 93 is assumed to be BIOS
-      filename "pxelinux.0";
-      }
+      else {
+      filename "pxelinux.0";}
 }
 subnet 192.168.10.0 netmask 255.255.255.0 {
-       range 192.168.10.2 192.168.10.50;
        option routers 192.168.10.1;
        option domain-name-servers 192.168.10.1;
 # next-server (TFTP server) IP address
        next-server 192.168.10.1;
+       pool {
+       allow members of "PXEClient";
+       range 192.168.10.2 192.168.10.50;}
 }
 ```
 
