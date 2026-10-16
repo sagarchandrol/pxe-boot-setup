@@ -1,5 +1,3 @@
-# The location for this file is /var/lib/tftpboot/BIOS/pxelinux.cfg/default
-
 DEFAULT menu.c32
 PROMPT 0
 TIMEOUT 30

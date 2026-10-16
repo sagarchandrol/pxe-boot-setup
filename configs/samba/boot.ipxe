@@ -1,0 +1,17 @@
+#!ipxe
+
+menu Windows UEFI Boot Menu
+item --gap --         ---------OPTIONS------------
+item --key d local    Boot from Local Disk [D]
+item --key w windows  Install Windows 10 LTSC [W]
+choose --default local --timeout 5000 target && goto ${target}
+
+:windows
+kernel http://192.168.10.1/UEFI/wimboot
+initrd http://192.168.10.1/UEFI/win/bcd
+initrd http://192.168.10.1/UEFI/win/boot.sdi
+initrd http://192.168.10.1/UEFI/win/boot.wim
+boot
+
+:local
+exit 1
