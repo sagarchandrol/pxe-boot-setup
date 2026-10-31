@@ -1,3 +1,7 @@
+# edited file on 31 oct 10;53
+
+
+
 #!/usr/bin/env bash
 
 dest="$HOME/pxe-boot-setup"
